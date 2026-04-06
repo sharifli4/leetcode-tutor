@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Check if auto_launch is enabled and inject a reminder to invoke /leetcode
+# This hook runs on PreToolUse for the Agent tool
+
+CONFIG_FILE="$HOME/.leetcode-tutor/settings.json"
+PLUGIN_DEFAULTS="${CLAUDE_PLUGIN_ROOT}/config/defaults.json"
+
+# Read auto_launch setting — check user config first, fall back to plugin defaults
+AUTO_LAUNCH="true"
+if [ -f "$CONFIG_FILE" ]; then
+  val=$(grep -o '"auto_launch"[[:space:]]*:[[:space:]]*[a-z]*' "$CONFIG_FILE" | grep -o '[a-z]*$')
+  [ -n "$val" ] && AUTO_LAUNCH="$val"
+elif [ -f "$PLUGIN_DEFAULTS" ]; then
+  val=$(grep -o '"auto_launch"[[:space:]]*:[[:space:]]*[a-z]*' "$PLUGIN_DEFAULTS" | grep -o '[a-z]*$')
+  [ -n "$val" ] && AUTO_LAUNCH="$val"
+fi
+
+if [ "$AUTO_LAUNCH" = "false" ]; then
+  exit 0
+fi
+
+# Check enabled flag
+ENABLED="true"
+if [ -f "$CONFIG_FILE" ]; then
+  val=$(grep -o '"enabled"[[:space:]]*:[[:space:]]*[a-z]*' "$CONFIG_FILE" | grep -o '[a-z]*$')
+  [ -n "$val" ] && ENABLED="$val"
+fi
+
+if [ "$ENABLED" = "false" ]; then
+  exit 0
+fi
+
+# Output a reminder for the agent to invoke /leetcode as a subagent
+echo "LEETCODE_TUTOR: A background agent is being dispatched. Invoke the /leetcode skill as a separate subagent to entertain the user while they wait."
