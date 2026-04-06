@@ -1,0 +1,6 @@
+{
+  "enabled": true,
+  "auto_launch": true,
+  "difficulty": "easy,medium",
+  "pause_seconds": 15
+}
